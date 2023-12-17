@@ -1,5 +1,5 @@
 import { name } from '@/atom';
-import dbUtil from '@/util';
+import { insertDBAPI, readDBAPI } from '@/lib/api/db';
 import { Button, Text, VStack, SlideFade, Input } from '@chakra-ui/react';
 import React, { useEffect, useState } from 'react';
 import { useRecoilState } from 'recoil';
@@ -38,6 +38,20 @@ function Index() {
     }
   };
 
+  const onLogin = async () => {
+    // 1. 이름이 db에 존재하는지 확인
+    // const name = await readDBAPI('user', ['name']);
+    // 2. 없으면 새로 등록
+    if (!false) {
+      const data = {
+        name: uname,
+      };
+      console.log('sdf');
+      const res = await insertDBAPI('user', data);
+      console.log('res', res);
+    }
+  };
+
   return (
     <div>
       <VStack p="200px 40px" gap={8}>
@@ -56,7 +70,7 @@ function Index() {
           value={uname || ''}
           onChange={(e) => setUname(e.target.value)}
         />
-        <Button
+        {/* <Button
           isLoading={!grant}
           colorScheme="blue"
           loadingText="Loading..."
@@ -71,9 +85,17 @@ function Index() {
           }}
         >
           Start!
-        </Button>
+        </Button> */}
         <Button onClick={requestSensorAccess} w="50%" colorScheme="whatsapp">
           Allow Sensor
+        </Button>
+        <Button
+          colorScheme="blue"
+          width="50%"
+          // TODO: Server API로
+          onClick={onLogin}
+        >
+          Test
         </Button>
       </VStack>
     </div>
