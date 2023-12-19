@@ -1,6 +1,7 @@
 import { name } from '@/atom';
 import { insertDBAPI, readDBAPI } from '@/lib/api/db';
 import { Button, Text, VStack, SlideFade, Input } from '@chakra-ui/react';
+import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 import { useRecoilState } from 'recoil';
 
@@ -8,6 +9,7 @@ function Index() {
   const [phone, setPhone] = useState();
   const [grant, setGrant] = useState(false);
   const [uname, setUname] = useRecoilState(name);
+  const router = useRouter();
 
   useEffect(() => {
     const userAgent = navigator.userAgent.toLocaleLowerCase();
@@ -39,16 +41,17 @@ function Index() {
   };
 
   const onLogin = async () => {
-    // 1. 이름이 db에 존재하는지 확인
-    // const name = await readDBAPI('user', ['name']);
-    // 2. 없으면 새로 등록
-    if (!false) {
+    const name = await readDBAPI('user', ['name']);
+    const nameArr = name.data.map((item) => item.name);
+    if (nameArr.includes(uname)) {
+      router.push('/board');
+    } else {
       const data = {
         name: uname,
       };
-      console.log('sdf');
       const res = await insertDBAPI('user', data);
       console.log('res', res);
+      router.push('/board');
     }
   };
 
@@ -70,31 +73,19 @@ function Index() {
           value={uname || ''}
           onChange={(e) => setUname(e.target.value)}
         />
-        {/* <Button
+        <Button
           isLoading={!grant}
           colorScheme="blue"
           loadingText="Loading..."
           width="50%"
-          // TODO: Server API로
-          onClick={async () => {
-            const client = await dbUtil.psql.makeClient();
-            await dbUtil.psql.insertDB(client, 'public', 'user', {
-              name: uname,
-            });
-            await dbUtil.psql.deleteClient(client);
-          }}
+          onClick={onLogin}
         >
           Start!
-        </Button> */}
+        </Button>
         <Button onClick={requestSensorAccess} w="50%" colorScheme="whatsapp">
           Allow Sensor
         </Button>
-        <Button
-          colorScheme="blue"
-          width="50%"
-          // TODO: Server API로
-          onClick={onLogin}
-        >
+        <Button colorScheme="blue" width="50%" onClick={onLogin}>
           Test
         </Button>
       </VStack>
