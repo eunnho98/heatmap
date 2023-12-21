@@ -2,11 +2,19 @@ import pandas as pd
 from pandas import DataFrame
 
 
-def getPoint(x_cut, y_cut, z_cut, dataf: DataFrame):
-    if x_cut * y_cut * z_cut > 1000:
-        raise Exception("Over 1000")
+def readData() -> DataFrame:
+    df = pd.read_csv("./data.csv")
+    return df[["x", "y", "row", "col", "x_rad", "y_rad", "z_rad"]]
 
-    df = dataf.copy()
+
+def getPoint(x_cut, y_cut, z_cut):
+    x_cut = int(x_cut)
+    y_cut = int(y_cut)
+    z_cut = int(z_cut)
+    if x_cut * y_cut * z_cut > 1000:
+        return "Over 1000"
+
+    df = readData()
     df["x_qcut"] = pd.qcut(df["x_rad"], q=x_cut)
     df["y_qcut"] = pd.qcut(df["y_rad"], q=y_cut)
     df["z_qcut"] = pd.qcut(df["z_rad"], q=z_cut)
@@ -15,7 +23,7 @@ def getPoint(x_cut, y_cut, z_cut, dataf: DataFrame):
 
 
 def getDots(dataf: DataFrame, x_rad: float, y_rad: float, z_rad: float):
-    df = dataf.copy()
+    df = dataf.copy(deep=False)
     x_intervals = df["x_qcut"].cat.categories
     y_intervals = df["y_qcut"].cat.categories
     z_intervals = df["z_qcut"].cat.categories
