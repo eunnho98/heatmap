@@ -64,7 +64,7 @@ function Index() {
           transition={{ enter: { duration: 0.5 } }}
         >
           <Text fontSize="4xl" fontWeight="bold">
-            Touch Data
+            Touch Data, 센서 허락을 해주세요.
           </Text>
         </SlideFade>
         <Input
@@ -74,7 +74,7 @@ function Index() {
           onChange={(e) => setUname(e.target.value)}
         />
         <Button
-          isLoading={!grant}
+          isDisabled={true}
           colorScheme="blue"
           loadingText="Loading..."
           width="50%"
@@ -85,8 +85,29 @@ function Index() {
         <Button onClick={requestSensorAccess} w="50%" colorScheme="whatsapp">
           Allow Sensor
         </Button>
-        <Button colorScheme="blue" width="50%" onClick={onLogin}>
+        <Button
+          colorScheme="blue"
+          width="50%"
+          onClick={onLogin}
+          isDisabled={true}
+        >
           Test
+        </Button>
+        <Button
+          isDisabled={true}
+          onClick={() => {
+            router.push('/accer');
+          }}
+        >
+          Go to Accer
+        </Button>
+        <Button
+          isLoading={!grant}
+          onClick={() => {
+            router.push('/dashboard');
+          }}
+        >
+          Go to Dashboard
         </Button>
       </VStack>
     </div>
