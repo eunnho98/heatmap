@@ -1,5 +1,8 @@
+import pickle
+import joblib
 import pandas as pd
 from pandas import DataFrame
+import numpy as np
 
 
 def readData() -> DataFrame:
@@ -46,3 +49,65 @@ def getDots(dataf: DataFrame, x_rad: float, y_rad: float, z_rad: float):
 
     except KeyError as e:
         return -1
+
+
+def get_model_and_wh(name):
+    model_path = f"./model/{name}.pkl"
+    wh_path = f"./data/whdata/{name}.pickle"
+
+    with open(wh_path, "rb") as f:
+        wh = pickle.load(f)
+
+    model = joblib.load(model_path)
+
+    return model, wh
+
+
+def pred_val(model, data, wh):
+    """
+    {'0': {'width': 0.0, 'height': 0.0, 'pos': 4},
+    '1': {'width': 0.0, 'height': 0.0, 'pos': 4},
+    '2': {'width': 0.0, 'height': 0.0, 'pos': 4},
+    '3': {'width': 0.0, 'height': 0.0, 'pos': 4},
+    '4': {'width': 0.0, 'height': 0.0, 'pos': 4},
+    '5': {'width': 0.0, 'height': 0.0, 'pos': 4},
+    '6': {'width': 0.0, 'height': 0.0, 'pos': 1},
+    '7': {'width': 0.0, 'height': 0.0, 'pos': 1},
+    '8': {'width': 9.0, 'height': 2.0, 'pos': 4}}
+    """
+    item = [[data["acc_x"], data["acc_y"], data["acc_z"]]]
+
+    pred = model.predict(item)
+    res = np.round(pred, decimals=2)
+    result_dict = {index: value for index, value in enumerate(res[0])}
+
+    wh_copy = wh.copy()
+    for key, value in wh_copy.items():
+        value["height"] = value["height"] * result_dict[int(key)]
+        value["width"] = value["width"] * result_dict[int(key)]
+
+    return wh_copy
+
+
+def get_row_col_group(clientid):
+    df = pd.read_csv(f"./data/{clientid}")
+    grouped_row_col = df.groupby(["row", "col"])
+    dfs = {}
+    for (row, col), group_df in grouped_row_col:
+        name = f"row{row}, col{col}"
+        dfs[name] = group_df[
+            [
+                "x",
+                "y",
+                "x_rad",
+                "y_rad",
+                "z_rad",
+                "row",
+                "col",
+                "x_degree",
+                "y_degree",
+                "z_degree",
+            ]
+        ]
+        dfs[name] = dfs[name].reset_index().drop("index", axis=1)
+    return dfs

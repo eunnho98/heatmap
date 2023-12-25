@@ -75,6 +75,10 @@ async def websocket_endpoint(websocket: WebSocket, clientid):
     except WebSocketDisconnect:
         print("Websocket Disconnected")
 
+@app.websocket("/ws2/{clientid}")
+async def web_2(websocket: WebSocket, clientid):
+
+
 
 def argparser():
     parser = argparse.ArgumentParser()
